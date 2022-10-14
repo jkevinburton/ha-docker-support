@@ -1,5 +1,5 @@
 /code_server/*
-/homeassistant/*
+/homeassistant
 /mariadb/*
 /mqtt/*
 /nodered/*

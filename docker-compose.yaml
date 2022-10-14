@@ -32,6 +32,7 @@ services:
     network_mode: host
     ports:
       - 443:443
+      - 8123:8123
     volumes:
       - /home/$USER/docker_files/homeassistant/config:/config
     environment:
