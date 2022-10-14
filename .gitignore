@@ -1,0 +1,11 @@
+/code_server/*
+/homeassistant/*
+/mariadb/*
+/mqtt/*
+/nodered/*
+/zigbee2mqtt/*
+.env
+.DS_Store
+.cloud
+.idea
+!.gitkeep
