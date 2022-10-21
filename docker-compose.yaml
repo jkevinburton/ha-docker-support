@@ -1,17 +1,6 @@
 version: '3.8'
-services:
 
-  portainer:
-    container_name: portainer
-    image: portainer/portainer-ce
-    restart: always
-    ports:
-      - "9000:9000/tcp"
-    environment:
-      - TZ=Europe/London
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /home/$USER/portainer:/data
+services:
 
   # ---------------------------------------------------------------
 
@@ -19,89 +8,33 @@ services:
     image: eclipse-mosquitto:latest
     container_name: "mqtt"
     restart: always
-    network_mode: host
     ports:
       - 1883:1883
       - 9001:9001
     volumes:
-      - /home/$USER/docker_files/mqtt/data:/mosquitto/data
-      - /home/$USER/docker_files/mqtt/config:/mosquitto/config
-      - /home/$USER/docker_files/mqtt/log:/mosquitto/log
+      - /home/$USER/ha-docker-support/mqtt/data:/mosquitto/data
+      - /home/$USER/ha-docker-support/mqtt/config:/mosquitto/config
+      - /home/$USER/ha-docker-support/mqtt/log:/mosquitto/log
     environment:
       - TZ=America/New_York
 
   # ---------------------------------------------------------------
 
   homeassistant:
-    #image: homeassistant/home-assistant:2021.2.3    #Specific Version
     image: homeassistant/home-assistant:latest     #Latest Production
-    container_name: "hass"
+    container_name: "homeassistant"
     restart: always
     depends_on:
-      - mariadb
       - mqtt
-      - zigbee2mqtt
-    network_mode: host
     ports:
       - 443:443
       - 8123:8123
     volumes:
-      - /home/$USER/docker_files/homeassistant/config:/config
+      - /home/$USER/ha-docker-support/homeassistant/config:/config
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
     environment:
       - TZ=America/New_York
-
-  # ---------------------------------------------------------------
-
-  zigbee2mqtt:
-    container_name: zigbee2mqtt
-    image: koenkk/zigbee2mqtt
-    restart: unless-stopped
-    volumes:
-      - /home/$USER/docker_files/zigbee2mqtt:/app/data
-      - /run/udev:/run/udev:ro
-    ports:
-      # Frontend port
-      - 8080:8080
-    environment:
-      - TZ=America/Toronto
-    devices:
-      # Make sure this matched your adapter location
-      - /dev/ttyUSB0:/dev/ttyACM0
-
-  # ---------------------------------------------------------------
-
-  nodered:
-    container_name: nodered
-    image: nodered/node-red
-    ports:
-      - 1880:1880
-    volumes:
-      - /home/$USER/docker_files/nodered:/data
-    depends_on:
-      - mariadb
-      - mqtt
-      - homeassistant
-    environment:
-      TZ: "America/Toronto"
-    restart: unless-stopped
-
-  # ---------------------------------------------------------------
-
-  mariadb:
-    image: linuxserver/mariadb
-    container_name: mariadb
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      MYSQL_DATABASE: ha_db
-      MYSQL_USER: homeassistant
-      MYSQL_PASSWORD: "${HA_MYSQL_PASSWORD}"
-      PUID: 1000
-      PGID: 1000
-    volumes:
-      - /home/$USER/docker_files/mariadb:/config
-    ports:
-      - 3306:3306
 
   # ---------------------------------------------------------------
 
@@ -112,9 +45,9 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Toronto
-      - DEFAULT_WORKSPACE=/home/$USER/docker_files/homeassistant
     volumes:
-      - /home/$USER/docker_files/code_server:/config
+      - /home/$USER/ha-docker-support/code_server:/config
+      - /home/$USER/ha-docker-support/homeassistant/config:/config/workspace
     ports:
       - 8443:8443
     restart: unless-stopped
