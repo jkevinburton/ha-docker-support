@@ -4,6 +4,7 @@
 /mqtt/*
 /nodered/*
 /zigbee2mqtt/*
+/esphome/*
 .env
 .DS_Store
 .cloud

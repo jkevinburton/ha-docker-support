@@ -20,6 +20,16 @@ services:
 
   # ---------------------------------------------------------------
 
+  esphome:
+    container_name: esphome
+    image: esphome/esphome
+    volumes:
+      - /home/$USER/ha-docker-support/esphome:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+    privileged: true
+    network_mode: host
+
   homeassistant:
     image: homeassistant/home-assistant:latest     #Latest Production
     container_name: "homeassistant"
