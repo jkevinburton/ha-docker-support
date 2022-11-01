@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  newasgard:
+    external: true
+
 services:
 
   # ---------------------------------------------------------------
@@ -17,6 +21,9 @@ services:
       - /home/$USER/ha-docker-support/mqtt/log:/mosquitto/log
     environment:
       - TZ=America/New_York
+    networks:
+      newasgard:
+        ipv4_address: 10.107.1.108
 
   # ---------------------------------------------------------------
 
@@ -24,11 +31,13 @@ services:
     container_name: esphome
     image: esphome/esphome
     volumes:
-      - /home/$USER/ha-docker-support/esphome:/config
+      - /home/$USER/ha-docker-support/homeassistant/config/esphome:/config
       - /etc/localtime:/etc/localtime:ro
     restart: always
     privileged: true
     network_mode: host
+    depends_on:
+      - homeassistant
 
   homeassistant:
     image: homeassistant/home-assistant:latest     #Latest Production
@@ -45,6 +54,10 @@ services:
       - /dev/ttyUSB0:/dev/ttyUSB0
     environment:
       - TZ=America/New_York
+    networks:
+      newasgard:
+        ipv4_address: 10.107.1.107
+
 
   # ---------------------------------------------------------------
 
