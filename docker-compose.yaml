@@ -74,3 +74,37 @@ services:
     ports:
       - 8443:8443
     restart: unless-stopped
+
+  # ---------------------------------------------------------------
+
+  influxdb:
+    image: influxdb:2.1.1
+    volumes:
+      - influxdb-storage:/var/lib/influxdb2:rw
+    env_file:
+      - .env
+    entrypoint: ["./influx_entrypoint.sh"]
+    restart: on-failure:10
+    ports:
+      - ${DOCKER_INFLUXDB_INIT_PORT}:8086
+    networks:
+      newasgard:
+        ipv4_address: 10.107.1.109
+    
+  # ---------------------------------------------------------------
+
+  grafana:
+    image: grafana/grafana-oss:8.4.3
+    volumes:
+      - grafana-storage:/var/lib/grafana:rw
+    depends_on:
+      - influxdb
+    ports:
+      - ${GRAFANA_PORT}:3000
+    networks:
+      newasgard:
+        ipv4_address: 10.107.1.110
+
+volumes:
+  grafana-storage:
+  influxdb-storage:
